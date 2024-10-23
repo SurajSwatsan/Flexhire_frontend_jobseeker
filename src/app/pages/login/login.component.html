@@ -1,0 +1,78 @@
+<div class="container">
+  <div class="form-wrapper">
+    <img class="logo" src="./assets/V_logo1_TB.png" alt="Logo" />
+    <h2>JobSeeker Login</h2>
+
+    <form class="form-container" [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off">
+      <div class="p-fluid">
+        <div class="p-field">
+          <span class="p-float-label">
+            <input
+              pInputText
+              id="identifier"
+              formControlName="identifier"
+              placeholder=" "  
+              autocomplete="off"
+              (focus)="onFocus()"
+              (input)="onInput()"
+            />
+            <label for="identifier">Email or Mobile Number*</label>
+          </span>
+
+          <div>
+          <small *ngIf="loginForm.get('identifier')?.hasError('required') && loginForm.get('identifier')?.touched" class="p-error">
+            Email or Mobile Number is required.
+          </small>
+          <small *ngIf="loginForm.get('identifier')?.touched && loginForm.get('required')?.hasError('invalidIdentifierValidator')" class="p-error">
+            Please enter a valid email or mobile number.
+          </small>
+          </div>
+        </div>
+        
+        
+
+        <div class="p-field password-field">
+          <div class="p-float-label">
+              <input
+                  pInputText
+                  [type]="hidePassword ? 'password' : 'text'"
+                  id="password"
+                  formControlName="password"
+                  (focus)="loginForm.get('password')?.markAsTouched()"
+                  placeholder=" " 
+              />
+              <label for="password">Password*</label>
+              <button
+                  pButton
+                  type="button"
+                  [icon]="hidePassword ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                  (click)="hidePassword = !hidePassword"
+                  class="p-button-icon-only"
+                  aria-label="Toggle password visibility"
+              ></button>
+          </div>
+
+          <div>
+          <small *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')" class="p-error">
+              Password is required.
+          </small>
+          <small *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')" class="p-error">
+              Password must be at least 6 characters long.
+          </small>
+          </div>
+      </div>
+      
+
+        <div style="display: flex; justify-content: flex-end; margin-top: -24px; padding: 12px 0;">
+          <a (click)="navigateTo()" style="color: #3e7194; font-size: 12px; text-decoration: none; font-weight: 600; cursor: pointer;">
+            Forgot Password?
+          </a>
+        </div>
+
+        <button pButton label="Login" type="submit" class="login-btn"></button>
+      </div>
+
+      <div class="forgot-password-link"></div>
+    </form>
+  </div>
+</div>
