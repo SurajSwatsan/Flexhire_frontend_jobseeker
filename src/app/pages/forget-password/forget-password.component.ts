@@ -1,65 +1,133 @@
-
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AbstractControl,FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { delay, interval, of, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-forget-password',
+  selector: 'app-forgot-password',
   templateUrl: './forget-password.component.html',
-  styleUrl: './forget-password.component.scss'
+  styleUrls: ['./forget-password.component.scss'],
 })
-export class ForgetPasswordComponent {
+export class ForgetPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm: FormGroup;
-  otpSent = false;
-  otp!: string;
-  newPassword!: string;
+  otpSent: boolean = false;
+  otpVerified = false;
+  timerActive:boolean = false;
+  countdown: number = 30; // 30 seconds
+  loading = false; // New loading state
+  timerSubscription: Subscription | undefined; // Declare here
 
-  constructor(private fb: FormBuilder, private router:Router, private snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder) {
     this.forgotPasswordForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      emailOrMobile: ['', [
+        Validators.required,
+        Validators.pattern(/(^\d{10}$)|(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/)
+      ]],
+      otp: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      otp: ['', Validators.required],
+      confirmPassword: ['', [Validators.required]]
+    },{ validators: this.passwordMatchValidator() });
+  }
+
+  ngOnInit():void {}
+
+  onSubmit() {
+    if (this.forgotPasswordForm.valid) {
+      if (this.otpVerified) {
+        // If OTP is verified, proceed with resetting the password
+        const formData = {
+          email: this.forgotPasswordForm.get('email')?.value,
+          password: this.forgotPasswordForm.get('password')?.value,
+        };
+        // Call your service to handle password reset
+        console.log('Password reset data:', formData);
+        // Example: this.passwordService.resetPassword(formData).subscribe(...)
+      } else {
+        console.log('OTP not verified. Please verify OTP first.');
+      }
+    } else {
+      console.log('Form is invalid');
+    }
+  }
+  
+  
+  
+    sendOtp() {
+      if (this.forgotPasswordForm.get('emailOrMobile')?.valid) {
+        this.otpSent = true;
+        this.startOtpTimer();
+  
+        // Simulate sending OTP (replace with actual API call)
+        console.log('OTP sent to:', this.forgotPasswordForm.get('emailOrMobile')?.value);
+      } else {
+        this.forgotPasswordForm.markAllAsTouched(); // Show validation errors
+      }
+  }
+
+  verifyOtp(): void {
+    if (this.forgotPasswordForm.get('otp')?.valid) {
+      // Simulate OTP verification (replace with actual API call)
+      console.log('OTP verified:', this.forgotPasswordForm.get('otp')?.value);
+      // Proceed to the next step
+    }
+  }
+
+  resendOtp(): void {
+    if (!this.timerActive) {
+      this.sendOtp();
+    }
+  }
+
+  private startOtpTimer(): void {
+    this.timerActive = true;
+    this.countdown = 30;
+
+    const timer = setInterval(() => {
+      this.countdown--;
+      if (this.countdown <= 0) {
+        clearInterval(timer);
+        this.timerActive = false;
+      }
+    }, 1000);
+  }
+
+  resetPassword() {
+    // Logic to reset the password
+  }
+
+  startTimer() {
+    this.timerActive = true;
+    this.timerSubscription = interval(1000).subscribe(() => {
+      if (this.countdown > 0) {
+        this.countdown--;
+      } else {
+        this.timerActive = false;
+        this.countdown = 30; // Reset for next resend
+        this.timerSubscription?.unsubscribe();
+      }
     });
   }
 
-  sendOtp() {
-    const emailControl = this.forgotPasswordForm.get('email');
-    if (emailControl) {
-      const email = emailControl.value;
-      // Call your service to send OTP
-      console.log(`Sending OTP to ${email}`);
-      this.otpSent = true;
-      this.otp = this.generateOtp(); // Simulate OTP generation
-    }
-  }
+
+
+  passwordMatchValidator() {
+    return (control: AbstractControl): { [key: string]: boolean } | null => {
+      const password = control.get('password')?.value;
+      const confirmPassword = control.get('confirmPassword')?.value;
   
-  resetPassword() {
-    if (this.forgotPasswordForm.valid) {
-      const otpControl = this.forgotPasswordForm.get('otp');
-      const passwordControl = this.forgotPasswordForm.get('password');
-  
-      if (otpControl && passwordControl) {
-        const enteredOtp = otpControl.value;
-        if (enteredOtp === this.otp) {
-          const newPassword = passwordControl.value;
-          // Call your service to reset the password
-          console.log(`Resetting password for ${this.forgotPasswordForm.get('email')?.value}`);
-          this.router.navigate(['/login']); 
-        } else {
-          alert('Invalid OTP');
-        }
-      }
+      return password && confirmPassword && password !== confirmPassword ? { passwordMismatch: true } : null;
+    };
+  }
+
+  otpValidator(control: AbstractControl): { [key: string]: boolean } | null {
+    const value = control.value;
+    const isValid = value === '' || /^[0-9]*$/.test(value); // Allow empty value or numeric only
+    return isValid ? null : { invalidOtp: true }; // Return error if not valid
+  }
+
+
+  ngOnDestroy() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
     }
-  }
-  showToast(message: string, action: string = 'Close', duration: number = 2500) {
-    this.snackBar.open(message, action, {
-      duration: duration,
-      verticalPosition: 'top',
-      horizontalPosition: 'right',
-    });
-  }
-  generateOtp() {
-    return '123456'; // Simulate OTP generation
   }
 }

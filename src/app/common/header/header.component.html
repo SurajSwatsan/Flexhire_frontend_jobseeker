@@ -1,1 +1,37 @@
-<p>hello</p>
+<!-- Nav Start -->
+<nav class="About">
+  <div class="nav__content">
+      <img src="assets/logo.png" alt="Logo" id="logo-image">
+      <input type="checkbox" name="check" id="check" class="checkbox">
+      <label for="check" class="checkbox">
+          <i class="fa fa-bars"></i>
+      </label>
+      <ul id="sidemenu">
+          <label for="check" class="close-icon">
+              <div><img src="assets/logo.png" alt="Menu Icon" id="menu-icon"></div>
+              <i class="fa fa-times"></i>
+          </label>
+          <li><a [routerLink]="['/jobs']" class="menu-link">Jobs</a></li>
+          <li><a [routerLink]="['/companies']" class="menu-link">Companies</a></li>
+          <li><a [routerLink]="['/price']" class="menu-link">Services</a></li>
+          <li><a [routerLink]="['/services']" class="menu-link">Price</a></li>
+      </ul>
+      <div class="p-toolbar-group-center">
+        <form (submit)="onSearch($event)">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText [(ngModel)]="searchQuery" name="search" placeholder="Search" />
+            <label>Search</label>
+          
+          <button type="submit" pButton label="Search" icon="pi pi-check"></button>
+        </span>
+        </form>
+      </div>
+      
+      <div class="auth-buttons">
+          <a [routerLink]="['/login']" class="btn login-btn">Login</a>
+          <a [routerLink]="['/signup']" class="btn signup-btn">Sign Up</a>
+      </div>
+      
+  </div>
+</nav>
