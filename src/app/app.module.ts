@@ -17,10 +17,15 @@ import { DefaultLayoutComponent } from './common/default-layout/default-layout.c
 import { HeaderComponent } from './common/header/header.component';
 import { FooterComponent } from './common/footer/footer.component';
 import { MenubarModule } from 'primeng/menubar';
+import { RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { RippleModule } from 'primeng/ripple';
 
 
 @NgModule({
-  declarations: [AppComponent, ForgetPasswordComponent, LoginComponent,DefaultLayoutComponent, HeaderComponent, FooterComponent],
+  declarations: [AppComponent, ForgetPasswordComponent, LoginComponent, DefaultLayoutComponent, HeaderComponent, FooterComponent],
   imports: [
     CommonModule,
     BrowserAnimationsModule, 
@@ -35,8 +40,12 @@ import { MenubarModule } from 'primeng/menubar';
     MessagesModule,
     AppRoutingModule,
     MenubarModule,
+    RouterModule,
+    ToastModule,
+    HttpClientModule,
+    RippleModule
   ],
-  providers:[],
+  providers:[MessageService],
   bootstrap:[AppComponent]
 })
 export class AppModule { }

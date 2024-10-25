@@ -6,7 +6,7 @@ import { NgModule } from '@angular/core';
 
  const routes: Routes = [
 
-    {path:'', redirectTo:"deafault-layout", pathMatch:'full'},
+    {path:'', redirectTo:"default-layout", pathMatch:'full'},
 
     {path:'login', component:LoginComponent},
     {path:'forget-password', component:ForgetPasswordComponent},
